@@ -17,7 +17,7 @@ variables:
 steps:
 - task: NuGetToolInstaller@0
   inputs:
-    versionSpec: '4.3.0' 
+    versionSpec: '4.4.1'
     #checkLatest: false # Optional
 
 - task: NuGetCommand@2
