@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 
@@ -174,8 +175,20 @@ namespace AcmeCorp.Training.Services
             }
         }
 
-        public class LatestVersionProvider :ProviderBase
+        public enum ApiVersion
         {
+            V1,
+            V2,
+            V3,
+            V4,
+            V5,
+            V6,
+            V7
+        }
+
+        public class LatestVersionProvider : ProviderBase
+        {
+            Random random = new Random();
             List<ProviderBase> allProviders = new List<ProviderBase>()
             {
                 new V1(),
@@ -187,12 +200,11 @@ namespace AcmeCorp.Training.Services
                 new V7(),
             };
 
-            /// <summary>
-            ///  /// <summary>
-            /// Returns a mixture of any previous version providers
-            /// </summary>
-            /// <returns></returns>
-            public override string ProvideMetadata() => base.ProvideMetadata();
+
+            public string ProvideMetadata(ApiVersion maxVersion)
+            {
+                return allProviders[random.Next((int)maxVersion+1)].ProvideMetadata(out _);
+            }
 
             internal override string ProvideMetadata(out string properCode)
             {

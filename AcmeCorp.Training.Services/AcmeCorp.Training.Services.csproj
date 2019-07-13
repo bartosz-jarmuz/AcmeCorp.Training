@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Bartosz Jarmuż</Authors>
+    <Description>Some silly fake services to be used for C# training classes</Description>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <ItemGroup>

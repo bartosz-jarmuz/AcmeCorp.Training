@@ -66,6 +66,13 @@ namespace Tests
         }
 
         [Test]
+        public void TestLatestExplicitMax()
+        {
+            var provider = new LegacyObjectMetadataProvider.LatestVersionProvider();
+            var metadata = provider.ProvideMetadata(LegacyObjectMetadataProvider.ApiVersion.V7);
+        }
+
+        [Test]
         public void TestError()
         {
             var provider = new LegacyObjectMetadataProvider.LatestVersionProvider();
