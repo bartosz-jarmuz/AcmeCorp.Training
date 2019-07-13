@@ -1,82 +1,31 @@
-using AcmeCorp.Training.Services;
-using Newtonsoft.Json;
-using NUnit.Framework;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
-namespace Tests
+namespace AcmeCorp.Training.Services
 {
-   
-    [TestFixture]
-    public class Tests
+    public class ObjectCodeValidator
     {
-        [Test]
-        public void TestV1()
+        public void AssertCodesAreValid(IDictionary<string, string> codesAndMetadata)
         {
-            var provider = new LegacyObjectMetadataProvider.V1();
-            ValidateProvider(provider.ProvideMetadata);
-        }
-
-        [Test]
-        public void TestV2()
-        {
-            var provider = new LegacyObjectMetadataProvider.V2();
-            ValidateProvider(provider.ProvideMetadata);
-        }
-
-        [Test]
-        public void TestV3()
-        {
-            var provider = new LegacyObjectMetadataProvider.V3();
-            ValidateProvider(provider.ProvideMetadata);
-        }
-
-        [Test]
-        public void TestV4()
-        {
-            var provider = new LegacyObjectMetadataProvider.V4();
-            ValidateProvider(provider.ProvideMetadata);
-        }
-
-        [Test]
-        public void TestV5()
-        {
-            var provider = new LegacyObjectMetadataProvider.V5();
-            ValidateProvider(provider.ProvideMetadata);
-        }
-        [Test]
-        public void TestV6()
-        {
-            var provider = new LegacyObjectMetadataProvider.V6();
-            ValidateProvider(provider.ProvideMetadata);
-        }
-        [Test]
-        public void TestV7()
-        {
-            var provider = new LegacyObjectMetadataProvider.V7();
-            ValidateProvider(provider.ProvideMetadata);
-        }
-        [Test]
-        public void TestLatest()
-        {
-            var provider = new LegacyObjectMetadataProvider.LatestVersionProvider();
-            ValidateProvider(provider.ProvideMetadata);
-        }
-
-        delegate string GetMetadataDelegate (out string properCode);
-
-        private void ValidateProvider(GetMetadataDelegate getMetadata)
-        {
-            for (int i = 0; i < 100000; i++)
+            foreach (var item in codesAndMetadata)
             {
-                var metadata = getMetadata(out string properCode);
-                var recognizedCode = GetCodeFromMetadata(metadata);
-                Assert.AreEqual(properCode, recognizedCode, $"metadata was : {metadata}");
+                AssertCodeIsValid(item.Key, item.Value);
             }
         }
 
-        private string GetCodeFromMetadata(string metadata)
+        public void AssertCodeIsValid(string code, string metadata)
+        {
+            var actualCode = GetCodeFromMetadata(metadata);
+            if (code != actualCode)
+            {
+                throw new InvalidOperationException($"The code [{code}] is not valid. Expected [{actualCode}]!");
+            }
+        }
+      
+        internal string GetCodeFromMetadata(string metadata)
         {
             try
             {
@@ -84,18 +33,20 @@ namespace Tests
                 {
 
                     XElement ele = XElement.Parse(metadata);
-                    if (ele != null)
                     {
-                        if (ele.Element("Code") != null)
+                        if (ele != null)
                         {
-                            var code = ele.Element("Code").Value;
-                            if (ele.Element("Market") != null)
+                            if (ele.Element("Code") != null)
                             {
-                                if (ele.Element("Market").Value == "PL" || ele.Element("Market").Value == "BG" || ele.Element("Market").Value == "EL")
+                                var code = ele.Element("Code").Value;
+                                if (ele.Element("Market") != null)
                                 {
-                                    return code.Remove(code.Length - 2);
+                                    if (ele.Element("Market").Value == "PL" || ele.Element("Market").Value == "BG" || ele.Element("Market").Value == "EL")
+                                    {
+                                        return code.Remove(code.Length - 2);
+                                    }
+                                    return code;
                                 }
-                                return code;
                             }
                         }
                     }
@@ -156,7 +107,7 @@ namespace Tests
                     return matches[matches.Count - 1].Value.Trim(new char[] { '_', '~' });
                 }
             }
-          
+
         }
     }
 }

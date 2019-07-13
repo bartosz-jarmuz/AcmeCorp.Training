@@ -12,7 +12,7 @@ namespace AcmeCorp.Training.Services
         public abstract class ProviderBase
         {
             internal abstract string ProvideMetadata(out string properCode);
-            public string ProvideMetadata()
+            public virtual string ProvideMetadata()
             {
                 return ProvideMetadata(out _);
             }
@@ -21,17 +21,28 @@ namespace AcmeCorp.Training.Services
 
         public class V1 : ProviderBase
         {
+            /// <summary>
+            /// Metadata consists of ItemNumber~ItemType_ItemGroup~Market_ObjectCode~ObjectGuid.Extension
+            /// </summary>
+            /// <returns></returns>
+            public override string ProvideMetadata() => base.ProvideMetadata();
+         
             internal override string ProvideMetadata(out string properCode)
             {
                 properCode = Code();
                 return $"{ItemNumber()}~{ItemType()}_{ItemGroup()}~{Market()}_{properCode}~{Guid()}.{Extension()}";
             }
-
-            
         }
 
         public class V2 : ProviderBase
         {
+            /// <summary>
+            ///  /// <summary>
+            /// Like in V1, but added _MarketCode_ after Market
+            /// </summary>
+            /// <returns></returns>
+            public override string ProvideMetadata() => base.ProvideMetadata();
+
             internal override string ProvideMetadata(out string properCode)
             {
                 properCode = Code();
@@ -41,6 +52,12 @@ namespace AcmeCorp.Training.Services
 
         public class V3 : ProviderBase
         {
+            /// <summary>
+            ///  /// <summary>
+            /// Like in V2, but added _SecondaryCode~WarehouseId after Guid
+            /// </summary>
+            /// <returns></returns>
+            public override string ProvideMetadata() => base.ProvideMetadata();
             internal override string ProvideMetadata(out string properCode)
             {
                 properCode = Code();
@@ -48,8 +65,18 @@ namespace AcmeCorp.Training.Services
             }
         }
 
+
         public class V4 : ProviderBase
         {
+
+            /// <summary>
+            ///  /// <summary>
+            /// Like in V3, but _version~ added after market code.
+            /// If version equal or higher than 6, the Object code is moved after object Guid
+            /// </summary>
+            /// <returns></returns>
+            public override string ProvideMetadata() => base.ProvideMetadata();
+
             internal override string ProvideMetadata(out string properCode)
             {
                 properCode = Code();
@@ -67,6 +94,14 @@ namespace AcmeCorp.Training.Services
 
         public class V5 : ProviderBase
         {
+
+            /// <summary>
+            ///  /// <summary>
+            /// Returns as XML Element. Parts of metadata are moved to a metadata element.
+            /// </summary>
+            /// <returns></returns>
+            public override string ProvideMetadata() => base.ProvideMetadata();
+
             protected XElement GetElement(out string properCode)
             {
                 properCode = Code();
@@ -83,7 +118,12 @@ namespace AcmeCorp.Training.Services
 
         public class V6 : ProviderBase
         {
-           
+            /// <summary>
+            ///  /// <summary>
+            /// Returns as Json string. Parts of metadata are moved to a metadata node.
+            /// </summary>
+            /// <returns></returns>
+            public override string ProvideMetadata() => base.ProvideMetadata();
             internal override string ProvideMetadata(out string properCode)
             {
                 properCode = Code();
@@ -104,6 +144,12 @@ namespace AcmeCorp.Training.Services
 
         public class V7 : ProviderBase
         {
+            /// <summary>
+            ///  /// <summary>
+            /// Returns as Json string. Object code is placed in the 'Code' XML element, but if the Market is Polish, Bulgarian or Greek, a Market string is added to the code
+            /// </summary>
+            /// <returns></returns>
+            public override string ProvideMetadata() => base.ProvideMetadata();
             protected XElement GetElement(out string properCode)
             {
                 properCode = Code();
@@ -140,6 +186,13 @@ namespace AcmeCorp.Training.Services
                 new V6(),
                 new V7(),
             };
+
+            /// <summary>
+            ///  /// <summary>
+            /// Returns a mixture of any previous version providers
+            /// </summary>
+            /// <returns></returns>
+            public override string ProvideMetadata() => base.ProvideMetadata();
 
             internal override string ProvideMetadata(out string properCode)
             {
